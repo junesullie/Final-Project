@@ -19,13 +19,13 @@ public class ReminderApplicationFinalProject
 	public static void main(String[] args) throws IOException 
 	{
 		int choice;								// user's menu choice
-		char letter = 'N';							// user's Y/N decision
+		char letter = 'N';						// user's Y/N decision
 		String assignmentName;					// Name of assignment entered
 		LocalDate dueDate = null;				// Formated due date
 		LocalDate today = LocalDate.now();		// Today's date
 		String answer;
 		
-		//Create null Array List to read Assignment objects into main method
+		//Create Array List to read Assignment objects into main method
 		ArrayList<Assignment> assignmentList = new ArrayList<Assignment>();
 		
 		// Create scanner object to read from keyboard
@@ -46,12 +46,28 @@ public class ReminderApplicationFinalProject
 	         switch(choice)
 	         {
 	            case 1:
+	            	// Print exit statement
+	            	System.out.println("If at any time you would like to return to the main"
+	            						+ " menu, please enter 'EXIT'");
+	            	
 	            	// Get new assignment name
 	            	System.out.println("Please enter the name of the assigment that is due. ");
 	            	assignmentName = keyboard.nextLine();
 	            	
+	            	if (assignmentName.equalsIgnoreCase("exit"))
+	            	{
+	            		System.out.println();
+	            		break;
+	            	}
+	            	
 	            	// Get new assignment due date
 	            	dueDate = convertLoop(assignmentName);
+	            	
+	            	if(dueDate == null)
+	            	{
+	            		System.out.println();
+	            		break;
+	            	}
 	            	
 	            	//Create new Assignment object using name and date provided by user
 	            	Assignment asmtName1 = new Assignment(assignmentName, dueDate);
@@ -68,14 +84,23 @@ public class ReminderApplicationFinalProject
 	            	if(!(assignmentList.size() == 0))
 	            	{
 	            		System.out.println("Assignments due today: ");
+	            		
+	            		int counter = 0;
 	            		for (Assignment asmtName2 : assignmentList)
 	            		{
 	            			dueDate = asmtName2.getDate();
 	            			if(dueDate.equals(today))
 	            			{
 	            				System.out.println(asmtName2.getName() + " is due today");
+	            				counter++;
 	            			}
 	            		}
+	            		
+	            		if (counter == 0)
+            			{
+            				System.out.println("There are no assignments due today.");
+            			}
+	            		
 	            		System.out.println();
 	            	}
 	            	
@@ -120,8 +145,7 @@ public class ReminderApplicationFinalProject
 
 /** 
 The printMenu method displays the menu of options for user.
-*/
-	   
+*/   
 	public static void printMenu()
 	{
 		//Display menu options 
@@ -136,6 +160,12 @@ The printMenu method displays the menu of options for user.
 	  
 	}	
 	
+	/**
+	 * The convert method converts a date stored in a String object into
+	 * a LocalDate object 
+	 * @param date
+	 * @return
+	 */
 	public static LocalDate convert(String date)
 	{
 		LocalDate dueDate = null;
@@ -156,8 +186,7 @@ The printMenu method displays the menu of options for user.
 	}
 	
 	/**
-	 * The convert2 method converts a date stored in a String object into
-	 * a LocalDate object
+	 * The convertLoop method 
 	 * @param name The name of the assignment
 	 * @return 
 	 */
@@ -166,26 +195,38 @@ The printMenu method displays the menu of options for user.
 		LocalDate dueDate = null;
 		DateTimeFormatter formatter = null;
 		String date;
+		boolean valid = false;
 		
 		Scanner keyboard = new Scanner(System.in);
 		
-		while (dueDate == null)
+		while (valid == false)
     	{
     		System.out.println("Please enter the date " + name + " is due. Please enter in MM-DD-YYYY format. ");
 			date = keyboard.nextLine();
 			
-        	//Convert the date from a string to a LocalDate
-        	try
-    		{
-    			formatter = DateTimeFormatter.ofPattern("M-d-yyyy");
-    			dueDate = LocalDate.parse(date, formatter);
-    			System.out.println();
-    		}
-    		catch (DateTimeParseException ex)
-    		{
-    			System.out.printf("%s is not parsable, please re-enter date.%n", date);
-    			
-    		}
+			if (date.equalsIgnoreCase("exit"))
+			{
+				dueDate = null;
+				valid = true;
+			}
+			
+			else
+			{
+	        	//Convert the date from a string to a LocalDate
+	        	try
+	    		{
+	    			formatter = DateTimeFormatter.ofPattern("M-d-yyyy");
+	    			dueDate = LocalDate.parse(date, formatter);
+	    			System.out.println();
+	    			valid = true;
+	    		}
+	    		catch (DateTimeParseException ex)
+	    		{
+	    			System.out.printf("%s is not parsable, please re-enter date in MM-DD-YYYY format.%n", date);
+	    			
+	    		
+	    		}
+			}
     	}
 		return dueDate;
 	}
